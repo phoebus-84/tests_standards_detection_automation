@@ -74,6 +74,35 @@ MUST support sender-constrained tokens using the mechanism defined in [RFC9449].
 MUST support [RFC7636] with S256 as the code challenge method.
 Both Wallet initiated and Issuer initiated issuance is supported.
 
+4.1. Credential Offer
+The Grant Type authorization_code MUST be supported as defined in Section 4.1.1 in [OIDF.OID4VCI]
+For Grant Type authorization_code, the Issuer MUST include a scope value in order to allow the Wallet to identify the desired Credential Type. The Wallet MUST use that value in the scope Authorization parameter.
+As a way to invoke the Wallet, at least a custom URL scheme haip:// MUST be supported. Implementations MAY support other ways to invoke the Wallets as agreed by trust frameworks/ecosystems/jurisdictions, not limited to using other custom URL schemes.
+Note: The Authorization Code flow does not require a Credential Offer from the Issuer to the Wallet. However, it is included in the feature set to allow for Issuer initiated Credential issuance.
+
+Both sending Credential Offer same-device and cross-device is supported.
+
+4.2. Authorization Endpoint
+MUST use Pushed Authorization Requests (PAR) [RFC9126] to send the Authorization Request.
+Wallets MUST authenticate itself at the PAR endpoint using the same rules as defined in Section 4.3 for client authentication at the token endpoint.
+MUST use the scope parameter to communicate credential type(s) to be issued. The scope value MUST map to a specific Credential type. The scope value may be pre-agreed, obtained from the Credential Offer, or the Credential Issuer Metadata.
+The client_id value in the PAR request MUST be a string that the Wallet has used as the sub value in the client attestation JWT.
+4.3. Token Endpoint
+The Wallets MUST perform client authentication as defined in Section 4.3.1.
+Refresh tokens are RECOMMENDED to be supported for credential refresh. For details, see Section 13.5 in [OIDF.OID4VCI].
+Note: It is RECOMMENDED to use ephemeral client attestation JWTs for client authentication in order to prevent linkability across Credential Issuers.
+
+Note: Issuers should be mindful of how long the usage of the refresh token is allowed to refresh a credential, as opposed to starting the issuance flow from the beginning. For example, if the User is trying to refresh a credential more than a year after its original issuance, the usage of the refresh tokens is NOT RECOMMENDED.
+
+4.3.1. Wallet Attestation
+Wallets MUST use wallet attestations as defined in Annex E of [OIDF.OID4VCI].
+
+The public key, and optionally a trust chain, used to validate the signature on the Wallet Attestation MUST be included in the x5c JOSE header.
+
+4.4. Credential Endpoint
+The JWT proof type MUST be supported.
+4.5. Server Metadata
+The Credential Issuer MUST publish a mapping of every Credential Type it supports to a scope value.
 5. OpenID for Verifiable Presentations profile for IETF SD-JWT VC
 Requirements for both the Wallet and the Verifier:
 
